@@ -1,7 +1,8 @@
 const http = require('http');
 const url = require('url');
 const query = require('querystring');
-const handler = require('./responses.js');
+const htmlHandler = require('./htmlResponses.js');
+const jsonHandler = require('./jsonResponses.js');
 
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
@@ -24,25 +25,25 @@ const handlePost = (request, response) => {
     const bodyString = Buffer.concat(body).toString();
     const bodyParams = query.parse(bodyString);
 
-    handler.addUser(request, res, bodyParams);
+    jsonHandler.addTask(request, res, bodyParams);
   });
 };
 
 const urlStruct = {
   GET: {
-    '/': handler.getIndex,
-    '/style.css': handler.getCSS,
-    '/getUsers': handler.getUsers,
-    '/notReal': handler.notFound,
-    notFound: handler.notFound,
+    '/': htmlHandler.getIndex,
+    '/style.css': htmlHandler.getCSS,
+    '/getTasks': jsonHandler.getTasks,
+    '/getCompletedTasks': jsonHandler.getCompletedTasks,
+    notFound: jsonHandler.notFound,
   },
   POST: {
-    '/addUser': handlePost,
+    '/addTask': handlePost,
   },
   HEAD: {
-    '/getUsers': handler.getUsersMeta,
-    '/notReal': handler.notFoundMeta,
-    notFound: handler.notFoundMeta,
+    '/getTasksMeta': jsonHandler.getTasksMeta,
+    '/getCompletedTasksMeta': jsonHandler.getCompletedTasksMeta,
+    notFound: jsonHandler.notFoundMeta,
   },
 };
 
