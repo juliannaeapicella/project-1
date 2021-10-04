@@ -3,9 +3,37 @@ const helper = require('./responseHelper.js');
 const tasks = {};
 const completedTasks = {};
 
-const getTasks = (request, response) => {
+const sortByTitle = (arr) => arr.sort((a, b) => b.title > a.title);
+
+const sortByDate = (arr) => arr.sort((a, b) => a.date - b.date);
+
+const sortByPriority = (arr) => arr.sort((a, b) => b.priority > a.priority);
+
+const getTasks = (request, response, params) => {
+  const sortedTasks = [];
+  const taskNames = Object.keys(tasks);
+
+  for (let i = 0; i < taskNames.length; i++) {
+    sortedTasks.push(tasks[taskNames[i]]);
+  }
+
+  switch (params.sort) {
+    case 'title':
+      sortByTitle(sortedTasks);
+      break;
+    case 'date':
+      sortByDate(sortedTasks);
+      break;
+    case 'priority':
+      sortByPriority(sortedTasks);
+      break;
+    default:
+      sortByDate(sortedTasks);
+      break;
+  }
+
   const responseJSON = {
-    tasks,
+    sortedTasks,
   };
 
   helper.respondJSON(request, response, 200, responseJSON);
@@ -15,9 +43,31 @@ const getTasksMeta = (request, response) => {
   helper.respondJSONMeta(request, response, 200);
 };
 
-const getCompletedTasks = (request, response) => {
+const getCompletedTasks = (request, response, params) => {
+  const sortedCompletedTasks = [];
+  const taskNames = Object.keys(completedTasks);
+
+  for (let i = 0; i < taskNames.length; i++) {
+    sortedCompletedTasks.push(completedTasks[taskNames[i]]);
+  }
+
+  switch (params.sort) {
+    case 'title':
+      sortByTitle(sortedCompletedTasks);
+      break;
+    case 'date':
+      sortByDate(sortedCompletedTasks);
+      break;
+    case 'priority':
+      sortByPriority(sortedCompletedTasks);
+      break;
+    default:
+      sortByDate(sortedCompletedTasks);
+      break;
+  }
+
   const responseJSON = {
-    completedTasks,
+    sortedCompletedTasks,
   };
 
   helper.respondJSON(request, response, 200, responseJSON);
@@ -26,8 +76,6 @@ const getCompletedTasks = (request, response) => {
 const getCompletedTasksMeta = (request, response) => {
   helper.respondJSONMeta(request, response, 200);
 };
-
-/// TBD: get with parameters (sort)??
 
 const addTask = (request, response, body) => {
   const responseJSON = {
@@ -49,7 +97,7 @@ const addTask = (request, response, body) => {
 
   tasks[body.title].title = body.title;
   tasks[body.title].desc = body.desc ? body.desc : '';
-  tasks[body.title].date = body.date ? body.date : '';
+  tasks[body.title].date = body.date ? new Date(`${body.date}`).toDateString() : '';
   tasks[body.title].time = body.time ? body.time : '';
   tasks[body.title].priority = body.priority ? body.priority : '';
 

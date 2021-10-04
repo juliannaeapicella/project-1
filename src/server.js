@@ -55,11 +55,13 @@ const urlStruct = {
 const onRequest = (request, response) => {
   const parsedUrl = url.parse(request.url);
 
+  const params = query.parse(parsedUrl.query);
+
   if (urlStruct[request.method][parsedUrl.pathname]) {
     if (request.method === 'POST') {
       urlStruct[request.method][parsedUrl.pathname](request, response, parsedUrl.pathname === '/addCompletedTask');
     } else {
-      urlStruct[request.method][parsedUrl.pathname](request, response);
+      urlStruct[request.method][parsedUrl.pathname](request, response, params);
     }
   } else {
     urlStruct[request.method].notFound(request, response);

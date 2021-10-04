@@ -32,22 +32,24 @@
 
       if (parseResponse && xhr.response) {
         const obj = JSON.parse(xhr.response);
+        console.log(obj);
 
-        if (obj.tasks) {
+        if (obj.sortedTasks) {
           taskList.innerHTML = "";
 
-          for (const task in obj.tasks) {
+          for (const task of obj.sortedTasks) {
+            console.log(task);
             const taskDiv = document.createElement('div');
-            taskDiv.innerHTML = generateTaskHTML(obj.tasks[task]);
+            taskDiv.innerHTML = generateTaskHTML(task);
             taskList.appendChild(taskDiv);
             taskDiv.addEventListener('click', postCompletedTask);
           }
-        } else if (obj.completedTasks) {
+        } else if (obj.sortedCompletedTasks) {
           completedTasks.innerHTML = "";
 
-          for (const task in obj.completedTasks) {
+          for (const task of obj.sortedCompletedTasks) {
             const taskDiv = document.createElement('div');
-            taskDiv.innerHTML = `<h3>${obj.completedTasks[task].title}</h3>`;
+            taskDiv.innerHTML = `<h3>${task.title}</h3>`;
             completedTasks.appendChild(taskDiv);
           }
         }
@@ -92,7 +94,7 @@
         </form>
         <h3>${task.title}</h3>
         <p>${task.desc}</p>
-        <p>${task.date} at ${task.time}</p>
+        <p>${task.date}</p>
         <p>${task.priority}</p>`;
     };
 
@@ -173,11 +175,11 @@
         <div id="priority">
           <p>Priority:</p>
           <label for="priority1">!</label>
-          <input class="priorityButton" type="radio" name="priority1" value="1" />
+          <input class="priorityButton" type="radio" id="priority1" name="priority" value="1" />
           <label for="priority2">!!</label>
-          <input class="priorityButton" type="radio" name="priority2" value="2" />
+          <input class="priorityButton" type="radio" id="priority2" name="priority" value="2" />
           <label for="priority3">!!!</label>
-          <input class="priorityButton" type="radio" name="priority3" value="3" />
+          <input class="priorityButton" type="radio" id="priority3" name="priority" value="3" />
         </div>
         
         <input type="submit" value="Add Task" />
@@ -186,7 +188,7 @@
     <label for="sort">Sort by:</label>
     <select id="sort" name="sort">
       <option value="title">Title</option>
-      <option value="date">Due Date</option>
+      <option value="date" selected>Due Date</option>
       <option value="priority">Priority</option>
     </select>
     <section>
