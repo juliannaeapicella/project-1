@@ -7,8 +7,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
   <script type="text/babel">
     const handleResponse = (xhr, parseResponse) => {
-      const content = document.querySelector('#content');
-
       const status = {};
 
       switch(xhr.status) {
@@ -35,20 +33,30 @@
       if (parseResponse && xhr.response) {
         const obj = JSON.parse(xhr.response);
 
-        if (obj.tasks) { // make this good
-          const task = document.createElement('p');
-          const tasks = JSON.stringify(obj.tasks);
-          task.textContent = tasks;
-          taskList.appendChild(task);
-        } else if (obj.completedTasks) {
+        if (obj.tasks) {
+          taskList.innerHTML = "";
 
+          for (const task in obj.tasks) {
+            const taskDiv = document.createElement('div');
+            taskDiv.innerHTML = generateTaskHTML(obj.tasks[task]);
+            taskList.appendChild(taskDiv);
+            taskDiv.addEventListener('click', postCompletedTask);
+          }
+        } else if (obj.completedTasks) {
+          completedTasks.innerHTML = "";
+
+          for (const task in obj.completedTasks) {
+            const taskDiv = document.createElement('div');
+            taskDiv.innerHTML = `<h3>${obj.completedTasks[task].title}</h3>`;
+            completedTasks.appendChild(taskDiv);
+          }
         }
       }
 
       console.dir(status);
     };
 
-    const requestUpdate = (e, url, method) => {
+    const requestUpdate = (e, url, method, formData) => {
       const xhr = new XMLHttpRequest();
       xhr.open(method, url);
 
@@ -64,17 +72,11 @@
         xhr.onload = () => handleResponse(xhr, false);
         xhr.send();
       } else if (method == 'post') {
-        const titleField = document.querySelector('#titleField');
-        const descField = document.querySelector('#descField');
-        const dateField = document.querySelector('#dateField');
-        const timeField = document.querySelector('#timeField');
-        const priorityButtons = document.querySelectorAll('.priorityButton');
-
-        const priorityValue = priorityButtons[0].value; /// TBD: make this function
-
-        xhr.onload = () => handleResponse(xhr, true);
-
-        const formData = `title=${titleField.value}&desc=${descField.value}&date=${dateField.value}&time=${timeField.value}&priority=${priorityValue}`;
+        xhr.onload = () => {
+          handleResponse(xhr, true);
+          getTasks(e);
+          getCompletedTasks(e);
+        };
 
         xhr.send(formData);
       }
@@ -83,13 +85,44 @@
       return false;
     };
 
+    const generateTaskHTML = (task) => {
+      return `
+        <form class="complete" action="/addCompletedTask" method="post">
+          <input id="${task.title}" type="submit" value="Complete" /> 
+        </form>
+        <h3>${task.title}</h3>
+        <p>${task.desc}</p>
+        <p>${task.date} at ${task.time}</p>
+        <p>${task.priority}</p>`;
+    };
+
     const postTask = (e) => {      
       const taskForm = document.querySelector('#taskForm');
       
       const url = taskForm.action;
       const method = taskForm.method;
 
-      requestUpdate(e, url, method);
+      const titleField = document.querySelector('#titleField');
+      const descField = document.querySelector('#descField');
+      const dateField = document.querySelector('#dateField');
+      const timeField = document.querySelector('#timeField');
+      const priorityButtons = document.querySelectorAll('.priorityButton');
+
+      let priorityValue;
+      for (let i = 0; i < priorityButtons.length; i++) {
+        if (priorityButtons[i].checked) {
+          priorityValue = priorityButtons[i].value;
+        }
+      }
+
+      const formData = `title=${titleField.value}&desc=${descField.value}&date=${dateField.value}&time=${timeField.value}&priority=${priorityValue}`;
+
+      requestUpdate(e, url, method, formData);
+    };
+
+    const postCompletedTask = (e) => { 
+      const formData = `title=${e.target.id}`;
+      requestUpdate(e, '/addCompletedTask', 'post', formData);
     }
 
     const getTasks = (e) => {      
@@ -99,7 +132,7 @@
       const method = taskButton.method;
 
       requestUpdate(e, url, method);
-    }
+    };
 
     const getCompletedTasks = (e) => {      
       const taskButton = document.querySelector('#refreshCompletedTasks');
@@ -108,7 +141,7 @@
       const method = taskButton.method;
 
       requestUpdate(e, url, method);
-    }
+    };
 
     const init = () => {     
       taskForm.addEventListener('submit', postTask);
@@ -150,6 +183,12 @@
         <input type="submit" value="Add Task" />
       </form>
     </section>
+    <label for="sort">Sort by:</label>
+    <select id="sort" name="sort">
+      <option value="title">Title</option>
+      <option value="date">Due Date</option>
+      <option value="priority">Priority</option>
+    </select>
     <section>
       <h2>To Do:</h2>
       <form id="refreshTasks" action="/getTasks" method="get">

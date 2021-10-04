@@ -27,7 +27,7 @@ const getCompletedTasksMeta = (request, response) => {
   helper.respondJSONMeta(request, response, 200);
 };
 
-/// TBD: get with parameters
+/// TBD: get with parameters (sort)??
 
 const addTask = (request, response, body) => {
   const responseJSON = {
@@ -61,7 +61,34 @@ const addTask = (request, response, body) => {
   return helper.respondJSONMeta(request, response, responseCode);
 };
 
-/// TBD: post completed tasks
+const addCompletedTask = (request, response, body) => {
+  const responseJSON = {
+    message: 'Title is required',
+  };
+
+  if (!body.title) {
+    responseJSON.id = 'missingParams';
+    return helper.respondJSON(request, response, 400, responseJSON);
+  }
+
+  let responseCode = 201;
+
+  if (completedTasks[body.title]) {
+    responseCode = 204;
+  } else {
+    completedTasks[body.title] = {};
+  }
+
+  delete tasks[body.title];
+  completedTasks[body.title].title = body.title;
+
+  if (responseCode === 201) {
+    responseJSON.message = 'Created Successfully';
+    return helper.respondJSON(request, response, responseCode, responseJSON);
+  }
+
+  return helper.respondJSONMeta(request, response, responseCode);
+};
 
 const notFound = (request, response) => {
   const responseJSON = {
@@ -82,6 +109,7 @@ module.exports = {
   getCompletedTasks,
   getCompletedTasksMeta,
   addTask,
+  addCompletedTask,
   notFound,
   notFoundMeta,
 };

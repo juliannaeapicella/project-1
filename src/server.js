@@ -6,7 +6,7 @@ const jsonHandler = require('./jsonResponses.js');
 
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
-const handlePost = (request, response) => {
+const handlePost = (request, response, isComplete) => {
   const res = response;
 
   const body = [];
@@ -25,7 +25,11 @@ const handlePost = (request, response) => {
     const bodyString = Buffer.concat(body).toString();
     const bodyParams = query.parse(bodyString);
 
-    jsonHandler.addTask(request, res, bodyParams);
+    if (isComplete) {
+      jsonHandler.addCompletedTask(request, res, bodyParams);
+    } else {
+      jsonHandler.addTask(request, res, bodyParams);
+    }
   });
 };
 
@@ -39,6 +43,7 @@ const urlStruct = {
   },
   POST: {
     '/addTask': handlePost,
+    '/addCompletedTask': handlePost,
   },
   HEAD: {
     '/getTasksMeta': jsonHandler.getTasksMeta,
@@ -51,7 +56,11 @@ const onRequest = (request, response) => {
   const parsedUrl = url.parse(request.url);
 
   if (urlStruct[request.method][parsedUrl.pathname]) {
-    urlStruct[request.method][parsedUrl.pathname](request, response);
+    if (request.method === 'POST') {
+      urlStruct[request.method][parsedUrl.pathname](request, response, parsedUrl.pathname === '/addCompletedTask');
+    } else {
+      urlStruct[request.method][parsedUrl.pathname](request, response);
+    }
   } else {
     urlStruct[request.method].notFound(request, response);
   }
