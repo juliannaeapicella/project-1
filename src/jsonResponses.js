@@ -1,13 +1,8 @@
 const helper = require('./responseHelper.js');
+const sort = require('./sort.js');
 
 const tasks = {};
 const completedTasks = {};
-
-const sortByTitle = (arr) => arr.sort((a, b) => b.title > a.title);
-
-const sortByDate = (arr) => arr.sort((a, b) => a.date - b.date);
-
-const sortByPriority = (arr) => arr.sort((a, b) => b.priority > a.priority);
 
 const getTasks = (request, response, params) => {
   const sortedTasks = [];
@@ -19,16 +14,16 @@ const getTasks = (request, response, params) => {
 
   switch (params.sort) {
     case 'title':
-      sortByTitle(sortedTasks);
+      sort.sortByTitle(sortedTasks);
       break;
     case 'date':
-      sortByDate(sortedTasks);
+      sort.sortByDate(sortedTasks);
       break;
     case 'priority':
-      sortByPriority(sortedTasks);
+      sort.sortByPriority(sortedTasks);
       break;
     default:
-      sortByDate(sortedTasks);
+      sort.sortByDate(sortedTasks);
       break;
   }
 
@@ -53,16 +48,9 @@ const getCompletedTasks = (request, response, params) => {
 
   switch (params.sort) {
     case 'title':
-      sortByTitle(sortedCompletedTasks);
-      break;
-    case 'date':
-      sortByDate(sortedCompletedTasks);
-      break;
-    case 'priority':
-      sortByPriority(sortedCompletedTasks);
+      sort.sortByTitle(sortedCompletedTasks);
       break;
     default:
-      sortByDate(sortedCompletedTasks);
       break;
   }
 

@@ -7,38 +7,13 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
   <script type="text/babel">
     const handleResponse = (xhr, parseResponse) => {
-      const status = {};
-
-      switch(xhr.status) {
-        case 200:
-          status.title = `Success`;
-          break;
-        case 201:
-          status.title = 'Create';
-          break;
-        case 204:
-          status.title = `Updated (No Content)`;
-          break;
-        case 400:
-          status.title = `Bad Request`;
-          break;
-        case 404:
-          status.title = `Resource Not Found`;
-          break;
-        default:
-          status.title = `Error code not implemented by client.`;
-          break;
-      }
-
       if (parseResponse && xhr.response) {
         const obj = JSON.parse(xhr.response);
-        console.log(obj);
 
         if (obj.sortedTasks) {
           taskList.innerHTML = "";
 
           for (const task of obj.sortedTasks) {
-            console.log(task);
             const taskDiv = document.createElement('div');
             taskDiv.innerHTML = generateTaskHTML(task);
             taskList.appendChild(taskDiv);
@@ -54,8 +29,6 @@
           }
         }
       }
-
-      console.dir(status);
     };
 
     const requestUpdate = (e, url, method, formData) => {
@@ -94,7 +67,7 @@
         </form>
         <h3>${task.title}</h3>
         <p>${task.desc}</p>
-        <p>${task.date}</p>
+        <p>${task.date} at ${task.time}</p>
         <p>${task.priority}</p>`;
     };
 
@@ -130,7 +103,7 @@
     const getTasks = (e) => {      
       const taskButton = document.querySelector('#refreshTasks');
       
-      const url = taskButton.action;
+      const url = `${taskButton.action}?sort=${sort.value}`;
       const method = taskButton.method;
 
       requestUpdate(e, url, method);
@@ -139,7 +112,7 @@
     const getCompletedTasks = (e) => {      
       const taskButton = document.querySelector('#refreshCompletedTasks');
       
-      const url = taskButton.action;
+      const url = `${taskButton.action}?sort=${completedSort.value}`;
       const method = taskButton.method;
 
       requestUpdate(e, url, method);
@@ -155,56 +128,64 @@
   </script>
 </head>
 <body>
-  <section id="top">
+  <title>
     <h1>please help me i am overloaded with work and can only think in terms of my next due date</h1>
-    <section>
-      <h2>Create New Task</h2>
-      <form id="taskForm" action="/addTask" method="post">
-        <label for="title">Title:</label>
-        <input id="titleField" type="text" name="title" />
+  </title>
 
-        <label for="desc">Description:</label>
-        <input id="descField" type="text" name="desc" />
+  <section id="createTaskForm">
+    <h2>Create New Task</h2>
+    <form id="taskForm" action="/addTask" method="post">
+      <label for="title">Title:</label>
+      <input id="titleField" type="text" name="title" />
 
-        <label for="date">Due Date:</label>
-        <input id="dateField" type="date" name="date" />
+      <label for="desc">Description:</label>
+      <input id="descField" type="text" name="desc" />
 
-        <label for="time">Time:</label>
-        <input id="timeField" type="time" name="time" />
+      <label for="date">Due Date:</label>
+      <input id="dateField" type="date" name="date" />
 
-        <div id="priority">
-          <p>Priority:</p>
-          <label for="priority1">!</label>
-          <input class="priorityButton" type="radio" id="priority1" name="priority" value="1" />
-          <label for="priority2">!!</label>
-          <input class="priorityButton" type="radio" id="priority2" name="priority" value="2" />
-          <label for="priority3">!!!</label>
-          <input class="priorityButton" type="radio" id="priority3" name="priority" value="3" />
-        </div>
+      <label for="time">Time:</label>
+      <input id="timeField" type="time" name="time" />
+
+      <div id="priority">
+        <p>Priority:</p>
+        <label for="priority1">!</label>
+        <input class="priorityButton" type="radio" id="priority1" name="priority" value="1" />
+        <label for="priority2">!!</label>
+        <input class="priorityButton" type="radio" id="priority2" name="priority" value="2" />
+        <label for="priority3">!!!</label>
+        <input class="priorityButton" type="radio" id="priority3" name="priority" value="3" />
+      </div>
         
-        <input type="submit" value="Add Task" />
-      </form>
-    </section>
+      <input type="submit" value="Add Task" />
+    </form>
+  </section>
+
+  <section id="tasksSection">
     <label for="sort">Sort by:</label>
     <select id="sort" name="sort">
       <option value="title">Title</option>
       <option value="date" selected>Due Date</option>
       <option value="priority">Priority</option>
     </select>
-    <section>
-      <h2>To Do:</h2>
-      <form id="refreshTasks" action="/getTasks" method="get">
-        <input type="submit" value="Refresh" />
-      </form>
-      <section id="taskList" >
-    </section>
-    <section>
-      <h2>Completed:</h2>
-      <form id="refreshCompletedTasks" action="/getCompletedTasks" method="get">
-        <input type="submit" value="Refresh" />
-      </form>
-      <section id="completedTasks" >
-    </section>
+    <h2>To Do:</h2>
+    <form id="refreshTasks" action="/getTasks" method="get">
+      <input type="submit" value="Refresh" />
+    </form>
+    <section id="taskList" >
+  </section>
+
+  <section is="completedTasksSection">
+    <label for="completedSort">Sort by:</label>
+    <select id="completedSort" name="completedSort">
+      <option value="title">Title</option>
+      <option value="completed" selected>Order Completed</option>
+    </select>
+    <h2>Completed:</h2>
+    <form id="refreshCompletedTasks" action="/getCompletedTasks" method="get">
+      <input type="submit" value="Refresh" />
+    </form>
+    <section id="completedTasks" >
   </section>
 </body>
 </html>
