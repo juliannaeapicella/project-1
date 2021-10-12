@@ -199,8 +199,9 @@
 
   <main>
     <section id="tasksSection">
-      <form id="refreshTasks" action="/getTasks" method="get">
-        <input type="submit" value=""/><i class="fas fa-sync-alt"></i></input>
+      <form class="refresh" id="refreshTasks" action="/getTasks" method="get">
+        <input type="submit" value=""/>
+        <i class="fas fa-sync-alt"></i>
       </form>
       
       <h2>To Do:</h2>
@@ -216,21 +217,25 @@
 
       <span id="addButton"><i class="fas fa-plus"></i> Add Task</span>
 
-      
-
       <section id="taskList"></section>
     </section>
 
-    <section is="completedTasksSection">
-      <label for="completedSort">Sort by:</label>
-      <select id="completedSort" name="completedSort">
-        <option value="title">Title</option>
-        <option value="completed" selected>Order Completed</option>
-      </select>
-      <h2>Completed:</h2>
-      <form id="refreshCompletedTasks" action="/getCompletedTasks" method="get">
-        <input type="submit" value="Refresh" />
+    <section id="completedTasksSection">
+      <form class="refresh" id="refreshCompletedTasks" action="/getCompletedTasks" method="get">
+        <input type="submit" value=""/>
+        <i class="fas fa-sync-alt"></i>
       </form>
+
+      <h2>Completed:</h2>
+
+      <div class="completedSort">
+        <label for="completedSort">Sort by:</label>
+        <select id="completedSort" name="completedSort">
+          <option value="title">Title</option>
+          <option value="completed" selected>Order Completed</option>
+        </select>
+      </div>
+      
       <section id="completedTasks"></section>
     </section>
   </main>
