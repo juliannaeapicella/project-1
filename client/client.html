@@ -66,14 +66,42 @@
     };
 
     const generateTaskHTML = (task) => {
-      return `
-        <form class="complete" action="/addCompletedTask" method="post">
-          <input id="${task.title}" type="submit" value="Complete" /> 
+      let color = "";
+      switch (task.priority) {
+        case '1':
+          color = "yellow";
+          break;
+        case '2':
+          color = "orange";
+          break;
+        case '3':
+          color = "red";
+          break;
+        default:
+          break;
+      };
+
+      let taskDiv = 
+        `<form class="complete" action="/addCompletedTask" method="post">
+          <input type="submit" value="Complete" /> 
+          <i id="${task.title}" class="fas fa-check-circle"></i>
         </form>
-        <h3>${task.title}</h3>
-        <p>${task.desc}</p>
-        <p>${task.date} at ${task.time}</p>
-        <p>${task.priority}</p>`;
+        <h3>${task.title}</h3>`;
+
+      if (task.priority && task.priority !== 'undefined')
+        taskDiv += `<span class="${color}"><i class="fas fa-exclamation"></i></span>`;
+      
+      if (task.date && task.time)
+        taskDiv += `<p class="date">${task.date} at ${task.time}</p>`;
+      else if (task.date) 
+        taskDiv += `<p class="date">${task.date}</p>`;
+      else if (task.time) 
+        taskDiv += `<p class="date">${task.time}</p>`;
+
+      if (task.desc)
+        taskDiv += `<p class="desc">${task.desc}</p>`;
+
+      return taskDiv;
     };
 
     const postTask = (e) => {      
@@ -96,6 +124,8 @@
       }
 
       const formData = `title=${titleField.value}&desc=${descField.value}&date=${dateField.value}&time=${timeField.value}&priority=${priorityValue}`;
+
+      taskForm.reset();
 
       requestUpdate(e, url, method, formData);
     };
@@ -143,6 +173,9 @@
       refreshTasks.addEventListener('click', getTasks);
       refreshCompletedTasks.addEventListener('click', getCompletedTasks);
       SetUpButtons();
+
+      refreshTasks.dispatchEvent(new Event('click'));
+      refreshCompletedTasks.dispatchEvent(new Event('click'));
     };
 
     window.onload = init;

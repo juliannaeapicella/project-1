@@ -98,7 +98,7 @@ h2 {
   font-family: 'Raleway', sans-serif;
   font-size: 12pt;
   font-weight: 600;
-  border: none;
+  border: 2px solid dodgerblue;;
   border-radius: 2em;
   color: white;
   background-color: dodgerblue;
@@ -140,7 +140,7 @@ main {
   margin-top: 1.3em;
 }
 
-.refresh input {
+.refresh input, .complete input {
   display: none;
 }
 
@@ -155,4 +155,63 @@ main {
 
 .completedSort {
   text-align: right;
+}
+
+#taskList {
+  padding-top: 1em;
+}
+
+#taskList .complete, h3 {
+  display: inline;
+}
+
+h3 {
+  padding: 0em 1em;
+}
+
+.date {
+  float: right;
+  padding: 0;
+}
+
+.desc {
+  margin: 0.5em 0;
+  padding-left: 2.5em;
+  border-top: 1px solid darkgray;
+  color: #909090;
+}
+
+#completedTasks {
+  padding-left: 1em;
+}
+
+/*on hover*/
+
+.refresh .fas:hover, .complete .fas:hover {
+  color: limegreen;
+}
+
+#addButton:hover {
+  color: dodgerblue;
+}
+
+#closeButton:hover {
+  color: darkred;
+}
+
+#taskForm .submit:hover {
+  border: 2px solid dodgerblue;
+  color: dodgerblue;
+  background-color: white;
+}
+
+/*transitions*/
+
+.refresh .fas, 
+.complete .fas, 
+#addButton, 
+#closeButton, 
+#taskForm .submit
+{
+  transition: 0.3s;
 }
