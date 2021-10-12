@@ -2,7 +2,12 @@
 <html lang="en">
 <head>
   <title>Our simple HTTP server</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Raleway:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="/style.css">
+
+  <script src="https://kit.fontawesome.com/c792dfbfc6.js" crossorigin="anonymous"></script>
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
   <script type="text/babel">
@@ -17,7 +22,7 @@
             const taskDiv = document.createElement('div');
             taskDiv.innerHTML = generateTaskHTML(task);
             taskList.appendChild(taskDiv);
-            taskDiv.addEventListener('click', postCompletedTask);
+            taskDiv.children[0].addEventListener('click', postCompletedTask);
           }
         } else if (obj.sortedCompletedTasks) {
           completedTasks.innerHTML = "";
@@ -118,74 +123,116 @@
       requestUpdate(e, url, method);
     };
 
+    const ToggleModal = (e) => {
+      const isClosed = e.target.className === "fas fa-plus" || e.target.id === "addButton";
+      if (isClosed) {
+        modal.style.display = "block";
+      } else {
+        modal.style.display = "none";
+      }
+    };
+
+    const SetUpButtons = () => {
+      addButton.addEventListener('click', ToggleModal);
+      closeButton.addEventListener('click', ToggleModal);
+    };
+
     const init = () => {     
       taskForm.addEventListener('submit', postTask);
+      taskForm.addEventListener('submit', ToggleModal);
       refreshTasks.addEventListener('click', getTasks);
       refreshCompletedTasks.addEventListener('click', getCompletedTasks);
+      SetUpButtons();
     };
 
     window.onload = init;
   </script>
 </head>
 <body>
-  <title>
-    <h1>please help me i am overloaded with work and can only think in terms of my next due date</h1>
-  </title>
+  <header>
+    <h1>Is your life falling apart?</h1>
+    <p>I can't fix that, but I can give you this planner.</p>
+  </header>
 
-  <section id="createTaskForm">
-    <h2>Create New Task</h2>
-    <form id="taskForm" action="/addTask" method="post">
-      <label for="title">Title:</label>
-      <input id="titleField" type="text" name="title" />
+  <div id="modal">
+    <section id="createTaskForm">
+      <span id="closeButton"><i class="far fa-times-circle"></i></span>
+      <h2>Create New Task</h2>
+      <form id="taskForm" action="/addTask" method="post">
+        <label for="title">Title:</label>
+        <input id="titleField" type="text" name="title" placeholder="My Task"/>
 
-      <label for="desc">Description:</label>
-      <input id="descField" type="text" name="desc" />
+        <label for="desc">Description:</label>
+        <input id="descField" type="text" name="desc" />
 
-      <label for="date">Due Date:</label>
-      <input id="dateField" type="date" name="date" />
+        <label for="date">Due Date:</label>
+        <input id="dateField" type="date" name="date" />
 
-      <label for="time">Time:</label>
-      <input id="timeField" type="time" name="time" />
+        <label for="time">Time:</label>
+        <input id="timeField" type="time" name="time" />
 
-      <div id="priority">
-        <p>Priority:</p>
-        <label for="priority1">!</label>
-        <input class="priorityButton" type="radio" id="priority1" name="priority" value="1" />
-        <label for="priority2">!!</label>
-        <input class="priorityButton" type="radio" id="priority2" name="priority" value="2" />
-        <label for="priority3">!!!</label>
-        <input class="priorityButton" type="radio" id="priority3" name="priority" value="3" />
+        <div id="priority">
+          <p>Priority:</p>
+
+          <div id="button-layout">
+            <div>
+              <label for="priority1"><span class="yellow">!</span></label>
+              <input class="priorityButton" type="radio" id="priority1" name="priority" value="1" />
+            </div>
+
+            <div>
+              <label for="priority2"><span class="orange">!!</span></label>
+              <input class="priorityButton" type="radio" id="priority2" name="priority" value="2" />
+            </div>
+
+            <div>
+              <label for="priority3"><span class="red">!!!</span></label>
+              <input class="priorityButton" type="radio" id="priority3" name="priority" value="3" />
+            </div>
+          </div>
+        </div>
+          
+        <input class="submit" type="submit" value="Add Task" />
+      </form>
+    </section>
+  </div>
+
+  <main>
+    <section id="tasksSection">
+      <form id="refreshTasks" action="/getTasks" method="get">
+        <input type="submit" value=""/><i class="fas fa-sync-alt"></i></input>
+      </form>
+      
+      <h2>To Do:</h2>
+
+      <div class="sort">
+        <label for="sort">Sort by:</label>
+        <select id="sort" name="sort">
+          <option value="title">Title</option>
+          <option value="date" selected>Due Date</option>
+          <option value="priority">Priority</option>
+        </select>
       </div>
-        
-      <input type="submit" value="Add Task" />
-    </form>
-  </section>
 
-  <section id="tasksSection">
-    <label for="sort">Sort by:</label>
-    <select id="sort" name="sort">
-      <option value="title">Title</option>
-      <option value="date" selected>Due Date</option>
-      <option value="priority">Priority</option>
-    </select>
-    <h2>To Do:</h2>
-    <form id="refreshTasks" action="/getTasks" method="get">
-      <input type="submit" value="Refresh" />
-    </form>
-    <section id="taskList" >
-  </section>
+      <span id="addButton"><i class="fas fa-plus"></i> Add Task</span>
 
-  <section is="completedTasksSection">
-    <label for="completedSort">Sort by:</label>
-    <select id="completedSort" name="completedSort">
-      <option value="title">Title</option>
-      <option value="completed" selected>Order Completed</option>
-    </select>
-    <h2>Completed:</h2>
-    <form id="refreshCompletedTasks" action="/getCompletedTasks" method="get">
-      <input type="submit" value="Refresh" />
-    </form>
-    <section id="completedTasks" >
-  </section>
+      
+
+      <section id="taskList"></section>
+    </section>
+
+    <section is="completedTasksSection">
+      <label for="completedSort">Sort by:</label>
+      <select id="completedSort" name="completedSort">
+        <option value="title">Title</option>
+        <option value="completed" selected>Order Completed</option>
+      </select>
+      <h2>Completed:</h2>
+      <form id="refreshCompletedTasks" action="/getCompletedTasks" method="get">
+        <input type="submit" value="Refresh" />
+      </form>
+      <section id="completedTasks"></section>
+    </section>
+  </main>
 </body>
 </html>

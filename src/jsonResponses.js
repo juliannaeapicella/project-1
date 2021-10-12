@@ -1,8 +1,37 @@
 const helper = require('./responseHelper.js');
 const sort = require('./sort.js');
 
-const tasks = {};
-const completedTasks = {};
+const tasks = {
+  test: {
+    title: 'test',
+    desc: 'an example',
+    date: 'Tue Oct 12 2021',
+    time: '21:57',
+    priority: '1',
+  },
+  experiment: {
+    title: 'experiment',
+    desc: 'another example',
+    date: 'Tue Oct 13 2021',
+    time: '23:57',
+    priority: '2',
+  },
+  drill: {
+    title: 'drill',
+    desc: 'an example',
+    date: 'Tue Oct 15 2021',
+    time: '23:59',
+    priority: '3',
+  },
+};
+const completedTasks = {
+  success: {
+    title: 'success',
+  },
+  failure: {
+    title: 'failure',
+  },
+};
 
 const getTasks = (request, response, params) => {
   const sortedTasks = [];
